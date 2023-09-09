@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  nginx:
+    build:
+      context: ./dockerfiles
+      dockerfile: nginx.dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/hosts:/etc/nginx/conf.d
+      # Here we can change the projects
+      # Tengo que agregar una linea por cada projecto
+      # START
+      - /Users/rogmide/Code:/apps
+      # END
+
+
+# Duplicar servicio por projecto
+# START
+  app-learning:
+    build:
+      context: ./dockerfiles
+      dockerfile: php8.dockerfile
+    volumes:  
+      - /Users/rogmide/Code:/apps
+    depends_on:
+      - mysql
+      - nginx
+# END
+
+  mysql:
+    platform: linux/arm64/v8
+    image: mysql:8
+    ports:
+      - "3306:3306"
+    env_file:
+      - ./env/mysql.env
+    volumes:
+      - mysql:/var/lib/mysql
+
+volumes:
+  mysql:
